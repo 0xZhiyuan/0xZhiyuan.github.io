@@ -21,7 +21,7 @@ Zhiyuan is actually a passionate bug hunter rather than a publication machine, m
 
 In addition to his work in blockchain security, Zhiyuan is currently self-studying financial investment and quantitative trading. He is eager to explore collaboration opportunities in these areas. If you are interested in working together, feel free to reach out to him via email.
 
-## Education & Experiences
+## Education
 
 - **Ph.D Candidate, The Hong Kong Polytechnic University** <br/>
 01/2023 - Present
