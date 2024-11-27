@@ -1,6 +1,6 @@
 module.exports = {
   title: "Homepage",
-  description: "Zhiyuan Sun's Homepage",
+  description: "Zhiyuan Sun's personal website",
   head: [["link", { rel: "icon", href: `/logo.png` }]],
   base: "/",
   dest: "./dist",
