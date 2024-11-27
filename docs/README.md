@@ -5,7 +5,7 @@ pageClass: home-page
 name: Zhiyuan Sun
 profile: /profile1.jpg
 
-bio: PhD Student at PolyU & SUSTech
+bio: PhD Student at HK PolyU & SUSTech
 email: zhi-yuan.sun[at]connect.polyu.hk
 ---
 
