@@ -33,19 +33,19 @@ In addition to his work in blockchain security, Zhiyuan is currently self-studyi
 09/2017 - 06/2021
 
 ## Publications
-  - **DoubleUp Roll: Double-spending in Arbitrum by Rolling It Back**
+  - **DoubleUp Roll: Double-spending in Arbitrum by Rolling It Back** [[PDF](./files/DoubleUp_Roll__Final_Version_.pdf)]
 
     <u>Z. Sun</u>, Z. Li, X. Peng, X. Luo, M. Jiang, H. Zhou, Y. Zhang
 
     *ACM Conference on Computer and Communications Security (CCS), 2024. [<font color="red">Distinguished Paper Awards</font>](https://www.sigsac.org/ccs/CCS2024/program/awards.html)*
 
-  - **Panda: Security Analysis of Algorand Smart Contracts**
+  - **Panda: Security Analysis of Algorand Smart Contracts** [[PDF](./files/Panda__Security_Analysis_of_Algorand_Smart_Contracts.pdf)]
 
     <u>Z. Sun</u>, X. Luo, Y. Zhang
 
     *USENIX Security Symposium (USENIX Security 23), 2023.*
 
-  - **Security Threat Mitigation for Smart Contracts: A Comprehensive Survey**
+  - **Security Threat Mitigation for Smart Contracts: A Comprehensive Survey** [[PDF](./files/ContractDefenseSurvey_CSUR21.pdf)]
 
     N. Ivanov, C. Li, Q. Yan, <u>Z. Sun</u>, Z. Cao, X. Luo
 

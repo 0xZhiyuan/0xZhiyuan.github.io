@@ -7,6 +7,10 @@ module.exports = {
 
   themeConfig: {
     search: false,
+    nav: [
+      { text: "Home", link: "/" },
+      { text: "Blog", link: "/blog/" },
+    ],
     sidebar: {
       '/guide/': genSidebarConfig('Guide')
     },
