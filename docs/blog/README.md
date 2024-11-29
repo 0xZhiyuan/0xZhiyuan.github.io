@@ -6,6 +6,13 @@ pageClass: projects-page
 
 **I will share all my bug hunting findings here, this blog will be updated gradually. Enjoy reading!**
 
+<ProjectCard>
+  
+  **Polygon zkEVM Series 1: Dual Execution Path Vulnerabilities**
+
+  To be writing....
+
+</ProjectCard>
 
 <ProjectCard>
   
@@ -30,7 +37,6 @@ pageClass: projects-page
   [[Click here to see details](./1)]
 
 </ProjectCard>
-
 
 <ProjectCard>
   
