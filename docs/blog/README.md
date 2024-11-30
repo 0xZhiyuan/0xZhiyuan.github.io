@@ -8,9 +8,21 @@ pageClass: projects-page
 
 <ProjectCard>
   
-  **Polygon zkEVM Series 1: Dual Execution Path Vulnerabilities**
+  **Polygon zkEVM Series 2: Unprovable Transactions**
 
-  To be writing....
+  To be writting....
+
+</ProjectCard>
+
+<ProjectCard>
+  
+  **Polygon zkEVM Series 1: Dual Execution Path**
+
+  <span style="color:green;">Label:</span> <span style="color:red;">ZK-Related Bug, Complex Bug</span>
+
+  A dual execution path vulnerability is fundamentally a soundness vulnerability. In the context of a zkEVM written in zkasm, such a vulnerability arises when multiple execution paths can lead to the same final state but consume different zk-related resources (e.g., STEP counters). This blog discuss 3 dual execution path vulnerabilities.
+
+  [[Click here to see details](./3)]
 
 </ProjectCard>
 
