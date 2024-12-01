@@ -18,7 +18,11 @@ pageClass: projects-page
   
   **Polygon zkEVM Series 3: ROM-Induced Unprovable Transactions**
 
-  To be writting...
+  <span style="color:green;">Label:</span> <span style="color:red;">ZK-Related Bug</span>
+
+  The ROM-induced unprovable transaction vulnerability in zk systems occurs when the ROM lacks checks for zkCounter or an execution path in the ROM contains unsolvable constraints. This blog discuss 4 ROM-induced unprovable transaction vulnerabilities.
+
+  [[Click here to see details](./5)]
 
 </ProjectCard>
 

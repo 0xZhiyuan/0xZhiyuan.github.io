@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Polygon zkEVM Series 3: ROM-Induced Unprovable Transactions | Homepage</title>
+    <meta name="generator" content="VuePress 1.9.10">
+    <link rel="icon" href="/logo.png">
+    <meta name="description" content="Zhiyuan Sun&#39;s personal website">
+    
+    <link rel="preload" href="/assets/css/0.styles.f21ffe49.css" as="style"><link rel="preload" href="/assets/js/app.2c4d7298.js" as="script"><link rel="preload" href="/assets/js/2.9c3d16e9.js" as="script"><link rel="preload" href="/assets/js/1.ae13b9d5.js" as="script"><link rel="preload" href="/assets/js/31.e4f1ff35.js" as="script"><link rel="prefetch" href="/assets/js/10.348fa4ae.js"><link rel="prefetch" href="/assets/js/11.16c60823.js"><link rel="prefetch" href="/assets/js/12.47b93c21.js"><link rel="prefetch" href="/assets/js/13.8eab7d11.js"><link rel="prefetch" href="/assets/js/14.9b92e4b9.js"><link rel="prefetch" href="/assets/js/15.36c13836.js"><link rel="prefetch" href="/assets/js/16.47e1d84d.js"><link rel="prefetch" href="/assets/js/17.86a696ad.js"><link rel="prefetch" href="/assets/js/18.0498bdb0.js"><link rel="prefetch" href="/assets/js/19.a0bcf0af.js"><link rel="prefetch" href="/assets/js/20.38ceeaed.js"><link rel="prefetch" href="/assets/js/21.0f3f7ec3.js"><link rel="prefetch" href="/assets/js/22.fbed27a9.js"><link rel="prefetch" href="/assets/js/23.bff8b7a9.js"><link rel="prefetch" href="/assets/js/24.3ae7893f.js"><link rel="prefetch" href="/assets/js/25.93f596bf.js"><link rel="prefetch" href="/assets/js/26.e2ff6647.js"><link rel="prefetch" href="/assets/js/27.f8ec3cf9.js"><link rel="prefetch" href="/assets/js/28.8163d402.js"><link rel="prefetch" href="/assets/js/29.66aa740a.js"><link rel="prefetch" href="/assets/js/3.6df97c0a.js"><link rel="prefetch" href="/assets/js/30.00564173.js"><link rel="prefetch" href="/assets/js/4.ea9d8b6e.js"><link rel="prefetch" href="/assets/js/5.94969ca9.js"><link rel="prefetch" href="/assets/js/6.d433241e.js"><link rel="prefetch" href="/assets/js/7.ab403544.js"><link rel="prefetch" href="/assets/js/vendors~docsearch.b3213737.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.f21ffe49.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">Homepage</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/blog/" class="nav-link router-link-active">
+  Blog
+</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/blog/" class="nav-link router-link-active">
+  Blog
+</a></div> <!----></nav>  <!----> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="polygon-zkevm-series-3-rom-induced-unprovable-transactions">Polygon zkEVM Series 3: ROM-Induced Unprovable Transactions</h1> <h2 id="defination">Defination</h2> <p>The ROM-induced unprovable transaction vulnerability in zk systems occurs when the ROM lacks checks for zkCounter or an execution path in the ROM contains unsolvable constraints.</p> <h2 id="exploitation-scenario">Exploitation Scenario</h2> <p>Since the state transition of such transaction is unprovable, the attacker can force the transaction to be finalized on L1 through a forced batch. Therefore, the L2 blockchain will be stuck.</p> <h2 id="case-1-missing-mem-align-counter-check">Case 1: Missing Mem-Align counter check</h2> <p>The Mem-Align counter checks are missing in the opcode CALLDATACOPY. Specifically, there is only a Mem-Align counter check at the start of the label <code>opCALLDATACOPY</code> as shown below.</p> <div class="language-zkasm extra-class"><pre class="language-text"><code>%MAX_CNT_MEM_ALIGN - CNT_MEM_ALIGN - 2   :JMPN(outOfCountersMemalign)
+</code></pre></div><p>However, during the execution of the CALLDATACOPY opcode, the Mem-Align secondary state machine is used twice every time a 32-byte data is copied, but the the Mem-Align counter is not checked dynamically here.</p> <p>In the CODECOPY opcode, the Mem-Align counter is checked as follows.</p> <div class="language-zkasm extra-class"><pre class="language-text"><code>opCODECOPYloopInit:
+    ; checks zk-counters
+    %MAX_CNT_MEM_ALIGN - CNT_MEM_ALIGN  - E     :JMPN(outOfCountersMemalign)
+</code></pre></div><p>Unfortunately, this check is missing in the CALLDATACOPY opcode.</p> <p>As a consequence, an attacker can construct a transaction that will use more than the maximum Mem-Align counter during execution. Next, the attacker can force this transaction to be finalized on L1 through a forced batch. However, since the Mem-Align counter consumed by this transaction exceeds the upper limit, its state transition cannot be proved by the prover. Therefore, the L2 blockchain will be stuck.</p> <h2 id="case-2-incorrect-implementation-of-long-division">Case 2: Incorrect implementation of long division</h2> <p>The modexp precompile contract is implemented in the Etrog update of Polygon zkEVM. The <code>/modexp/array_lib/array_div_long.zkasm</code> file implements the long division used in this precompile contract. However, the logic of the long division implemented in this file is incorrect. The erroneous logic is located in the following code snippet. Specifically, this code does not work when the remainder is 0 (i.e., when inA is divisible by inB).</p> <div class="language-zkasm extra-class"><pre class="language-text"><code>array_div_long_mul_quo_inB:
+                        :CALL(array_mul)
+
+        $ =&gt; D          :MLOAD(array_div_long_len_inB)
+        %MAX_CNT_BINARY - CNT_BINARY - 1                                        :JMPN(outOfCountersBinary)
+        %MAX_CNT_STEPS - STEP        - 8 - 3*%ARRAY_MAX_LEN - 3*D - 1           :JMPN(outOfCountersStep)
+
+        ; Check the remainder
+        $0{receiveLenRemainder()} =&gt; D
+
+        ; 1] The received length must be between 1 and %ARRAY_MAX_LEN
+        D - 1 =&gt; E              :JMPN(failAssert) ; If D = 0, then fail
+        %ARRAY_MAX_LEN - D      :JMPN(failAssert) ; If D &gt; %ARRAY_MAX_LEN, then fail
+        ; From here, 1 &lt;= D &lt;= %ARRAY_MAX_LEN
+
+        ; 2] To avoid non-determinism, we must ensure that the remainder is trimmed
+        ; i.e., that its last chunk is not 0
+        ${receiveRemainderChunk(E)} =&gt; A
+        0 =&gt; B
+        0               :EQ
+        ; From here, the remainder is trimmed
+
+        ; 3] Finally, we must ensure that the remainder is lower than inB
+        $ =&gt; C           :MLOAD(array_div_long_len_inB)
+        C - 1 =&gt; RR
+        D - 1 =&gt; E
+
+        ; save the first non-zero chunk of rem
+        A               :MSTORE(array_compare_inB + E)
+        E - 1 =&gt; E      :JMPN(array_div_long_compare_inB2)
+</code></pre></div><p>Firstly, the following code ensures that the length of the remainder is greater than or equal to 1.</p> <div class="language-zkasm extra-class"><pre class="language-text"><code>; Check the remainder
+$0{receiveLenRemainder()} =&gt; D
+
+; 1] The received length must be between 1 and %ARRAY_MAX_LEN
+D - 1 =&gt; E              :JMPN(failAssert) ; If D = 0, then fail
+%ARRAY_MAX_LEN - D      :JMPN(failAssert) ; If D &gt; %ARRAY_MAX_LEN, then fail
+; From here, 1 &lt;= D &lt;= %ARRAY_MAX_LEN
+</code></pre></div><p>Secondly, the code below ensures that the last chunk of the remainder is not 0.</p> <div class="language-zkasm extra-class"><pre class="language-text"><code> ; i.e., that its last chunk is not 0
+${receiveRemainderChunk(E)} =&gt; A
+0 =&gt; B
+0               :EQ
+</code></pre></div><p>When the remainder is 0, the above two conditions cannot be met simultaneously, therefore, the state transition of this transaction cannot be proven!</p> <h2 id="case-3-incorrect-array-size-in-the-modexp-precompile">Case 3: Incorrect array size in the modexp precompile</h2> <p>The <code>/modexp/array_lib/array_div_long.zkasm</code> file implements the long division used in the modexp precompile contract. The following code is used to copy data of length <code>array_mul_len_out</code> from <code>array_mul_out</code> to <code>array_add_AGTB_inA</code>.</p> <div class="language-zkasm extra-class"><pre class="language-text"><code>array_div_long_compare2:
+                        :CALL(array_compare)
+
+        %MAX_CNT_STEPS - STEP - 5 - 3*%ARRAY_MAX_LEN - 4*%ARRAY_MAX_LEN - 1        :JMPN(outOfCountersStep)
+
+        2               :MLOAD(array_compare_result)
+
+        D               :MSTORE(array_div_long_len_rem)
+
+        ; prepare output and remainder to be added
+        $ =&gt; C          :MLOAD(array_mul_len_out)
+        C - 1 =&gt; RR
+        D - 1 =&gt; E
+
+array_div_long_res_to_add:
+        $ =&gt; A          :MLOAD(array_mul_out + RR)
+        A               :MSTORE(array_add_AGTB_inA + RR)
+        RR - 1 =&gt; RR    :JMPN(array_div_long_rem_to_add, array_div_long_res_to_add)
+</code></pre></div><p>However, as shown in the following code, the maximum length of array <code>array_mul_out</code> is <code>%ARRAY_MAX_LEN_DOUBLED</code> and the maximum length of array <code>array_add_AGTB_inA</code> is <code>%ARRAY_MAX_LEN</code>.</p> <div class="language-zkasm extra-class"><pre class="language-text"><code>VAR GLOBAL array_mul_out[%ARRAY_MAX_LEN_DOUBLED]
+</code></pre></div><div class="language-zkasm extra-class"><pre class="language-text"><code>VAR GLOBAL array_add_AGTB_inA[%ARRAY_MAX_LEN]
+</code></pre></div><p>Therefore, when the length of array <code>array_mul_out</code> is greater than <code>%ARRAY_MAX_LEN</code>, the above code will cause overflow when copying data. The overflow issue will cause the following PIL constraints cannot be satisfied which can lead to an unprovable transaction.</p> <div class="language-zkasm extra-class"><pre class="language-text"><code>1               :MLOAD(array_compare_result)
+</code></pre></div><h2 id="case-4-missing-checks-in-changel2block-transaction">Case 4: Missing checks in ChangeL2Block transaction</h2> <p>Polygon zkEVM introduced a new transaction type, ChangeL2Block, in the Etrog update, with the format as follows. The <code>indexL1InfoTree</code> variable is used to specify the path for the SMT proof.</p> <div class="language- extra-class"><pre class="language-text"><code>;; ChangeL2BlockTx:
+;;   - fields: [type | deltaTimestamp | indexL1InfoTree ]
+;;   - bytes:  [  1  |       4        |        4        ]
+</code></pre></div><p>In the file <code>process-change-l2-block.zkasm</code>, the following code is used to verify the SMT proof. The path of the SMT proof is <code>indexL1InfoTree</code>, and the leaf value is <code>Keccak256(gerL1InfoTree||blockHashL1||timestamp)</code>.</p> <div class="language-zkasm extra-class"><pre class="language-text"><code>$                                                   :MLOAD(indexL1InfoTree), JMPZ(skipSetGERL1InfoTree)
+
+${getL1InfoGER(mem.indexL1InfoTree)} =&gt; A           :MSTORE(gerL1InfoTree)
+${getL1InfoBlockHash(mem.indexL1InfoTree)} =&gt; B     :MSTORE(blockHashL1InfoTree)
+${getL1InfoTimestamp(mem.indexL1InfoTree)} =&gt; C     :MSTORE(timestampL1InfoTree)
+                                                    :CALL(verifyMerkleProof)
+</code></pre></div><p>The SMT is maintained by the L1 contract <code>DepositContractBase.sol</code>. From the <code>getRoot</code> function, we know that the path of the SMT proof is <code>depositCount</code>.</p> <div class="language-solidity extra-class"><pre class="language-solidity"><code><span class="token keyword">function</span> <span class="token function">getRoot</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">public</span> <span class="token keyword">view</span> virtual <span class="token keyword">returns</span> <span class="token punctuation">(</span><span class="token builtin">bytes32</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token builtin">bytes32</span> node<span class="token punctuation">;</span>
+        <span class="token builtin">uint256</span> size <span class="token operator">=</span> depositCount<span class="token punctuation">;</span>
+        <span class="token builtin">bytes32</span> currentZeroHashHeight <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>
+            <span class="token builtin">uint256</span> height <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+            height <span class="token operator">&lt;</span> _DEPOSIT_CONTRACT_TREE_DEPTH<span class="token punctuation">;</span>
+            height<span class="token operator">++</span>
+        <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>size <span class="token operator">&gt;&gt;</span> height<span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span>
+                node <span class="token operator">=</span> <span class="token function">keccak256</span><span class="token punctuation">(</span>abi<span class="token punctuation">.</span><span class="token function">encodePacked</span><span class="token punctuation">(</span>_branch<span class="token punctuation">[</span>height<span class="token punctuation">]</span><span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">else</span>
+                node <span class="token operator">=</span> <span class="token function">keccak256</span><span class="token punctuation">(</span>abi<span class="token punctuation">.</span><span class="token function">encodePacked</span><span class="token punctuation">(</span>node<span class="token punctuation">,</span> currentZeroHashHeight<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            currentZeroHashHeight <span class="token operator">=</span> <span class="token function">keccak256</span><span class="token punctuation">(</span>
+                abi<span class="token punctuation">.</span><span class="token function">encodePacked</span><span class="token punctuation">(</span>currentZeroHashHeight<span class="token punctuation">,</span> currentZeroHashHeight<span class="token punctuation">)</span>
+            <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> node<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>Therefore, if a malicious sequencer set the <code>indexL1InfoTree</code> variable in the <code>ChangeL2Block</code> transaction to a very large number (much larger than the depositCount), the state transition of this batch will be unprovable. This is because the leaf value of such path is zero but <code>Keccak256(gerL1InfoTree||blockHashL1||timestamp)</code> cannot be zero!</p> <h2 id="disclose-timeline">Disclose Timeline</h2> <ul><li><strong>Case 1</strong>: Reported in <span style="color:blue;">August 2023</span> and confirmed as <span style="color:red;">high severity</span>.</li> <li><strong>Case 2</strong>: Reported in <span style="color:blue;">February 2024</span> and confirmed as <span style="color:red;">medium severity</span>.</li> <li><strong>Case 3</strong>: Reported in <span style="color:blue;">February 2024</span> and acknowledged as internally known.</li> <li><strong>Case 4</strong>: Reported in <span style="color:blue;">February 2024</span> and confirmed as <span style="color:red;">medium severity</span>.</li></ul></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.2c4d7298.js" defer></script><script src="/assets/js/2.9c3d16e9.js" defer></script><script src="/assets/js/1.ae13b9d5.js" defer></script><script src="/assets/js/31.e4f1ff35.js" defer></script>
+  </body>
+</html>
